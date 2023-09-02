@@ -1,7 +1,15 @@
 <script setup>
-
 import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/vue";
 import {ArrowRightOnRectangleIcon, UserCircleIcon} from "@heroicons/vue/20/solid/index.js";
+import CreateFolderModal from "@/Components/app/CreateFolderModal.vue";
+import {ref} from "vue";
+
+
+function showCreateFolderModal() {
+    createFolderModal.value = true;
+}
+
+const createFolderModal = ref(false);
 </script>
 
 <template>
@@ -26,7 +34,8 @@ import {ArrowRightOnRectangleIcon, UserCircleIcon} from "@heroicons/vue/20/solid
             >
                 <div class="px-1 py-1">
                     <MenuItem v-slot="{ active }">
-                        <a class="text-gray-700 block px-4 py-2 text-sm">
+                        <a href="#" @click.prevent="showCreateFolderModal"
+                           class="text-gray-700 block px-4 py-2 text-sm">
                             <UserCircleIcon
                                 :active="active"
                                 class="mr-2 h-5 w-5 text-indigo-400"
@@ -61,6 +70,8 @@ import {ArrowRightOnRectangleIcon, UserCircleIcon} from "@heroicons/vue/20/solid
             </MenuItems>
         </transition>
     </Menu>
+
+    <CreateFolderModal v-model="createFolderModal"/>
 </template>
 
 <style scoped>
