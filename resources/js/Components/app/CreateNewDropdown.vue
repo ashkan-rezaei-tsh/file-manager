@@ -1,17 +1,3 @@
-<script setup>
-import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/vue";
-import {ArrowRightOnRectangleIcon, UserCircleIcon} from "@heroicons/vue/20/solid/index.js";
-import CreateFolderModal from "@/Components/app/CreateFolderModal.vue";
-import {ref} from "vue";
-
-
-function showCreateFolderModal() {
-    createFolderModal.value = true;
-}
-
-const createFolderModal = ref(false);
-</script>
-
 <template>
     <Menu as="div" class="relative block text-left">
         <MenuButton
@@ -36,11 +22,6 @@ const createFolderModal = ref(false);
                     <MenuItem v-slot="{ active }">
                         <a href="#" @click.prevent="showCreateFolderModal"
                            class="text-gray-700 block px-4 py-2 text-sm">
-                            <UserCircleIcon
-                                :active="active"
-                                class="mr-2 h-5 w-5 text-indigo-400"
-                                aria-hidden="true"
-                            />
                             New Folder
                         </a>
                     </MenuItem>
@@ -48,22 +29,12 @@ const createFolderModal = ref(false);
                 <div class="px-1 py-1">
                     <MenuItem v-slot="{ active }">
                         <a class="text-gray-700 block px-4 py-2 text-sm">
-                            <ArrowRightOnRectangleIcon
-                                :active="active"
-                                class="mr-2 h-5 w-5 text-indigo-400"
-                                aria-hidden="true"
-                            />
-                            Logout
+                            Upload Files
                         </a>
                     </MenuItem>
                     <MenuItem v-slot="{active}">
                         <a class="text-gray-700 block px-4 py-2 text-sm">
-                            <ArrowRightOnRectangleIcon
-                                :active="active"
-                                class="mr-2 h-5 w-5 text-indigo-400"
-                                aria-hidden="true"
-                            />
-                            Logout
+                            Upload Folder
                         </a>
                     </MenuItem>
                 </div>
@@ -77,3 +48,16 @@ const createFolderModal = ref(false);
 <style scoped>
 
 </style>
+<script setup>
+import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/vue";
+import {ArrowRightOnRectangleIcon, UserCircleIcon} from "@heroicons/vue/20/solid/index.js";
+import CreateFolderModal from "@/Components/app/CreateFolderModal.vue";
+import {ref} from "vue";
+
+
+function showCreateFolderModal() {
+    createFolderModal.value = true;
+}
+
+const createFolderModal = ref(false);
+</script>

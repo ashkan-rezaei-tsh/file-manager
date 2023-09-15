@@ -28,7 +28,7 @@ class StoreFolderRequest extends ParentIdBaseRequest
     }
 
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.unique' => 'Folder ":input" already exists'

@@ -1,7 +1,3 @@
-<style scoped>
-
-</style>
-
 <template>
     <Modal :show="modelValue" @show="onShow" max-width="sm">
         <div class="p-6">
@@ -33,18 +29,25 @@
     </Modal>
 </template>
 
+<style scoped>
+
+</style>
+
 <script setup>
 import Modal from '@/Components/Modal.vue'
 import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
-import {useForm} from "@inertiajs/vue3";
+import {useForm, usePage} from "@inertiajs/vue3";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {nextTick, ref} from "vue";
 
+const page = usePage();
+
 const form = useForm({
-    name: ''
+    name: '',
+    parent_id: null
 });
 
 const folderNameInput = ref(null)
@@ -61,6 +64,7 @@ function onShow() {
 }
 
 function createFolder() {
+    form.parent_id = page.props.folder.id;
     form.post(route('folder.create'), {
         preserveScroll: true,
         onSuccess: () => {
