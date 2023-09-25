@@ -19,7 +19,7 @@ import NavLink from "@/Components/NavLink.vue";
                 <NavLink :href="route('myFiles')" :active="$page.url === '/my-files'">My Files</NavLink>
                 <NavLink href="/">Shared With Me</NavLink>
                 <NavLink href="/">Shared By Me</NavLink>
-                <NavLink href="/">Trash</NavLink>
+                <NavLink :href="route('trash')" :active="$page.url === '/trash'">Trash</NavLink>
             </div>
         </div>
     </nav>

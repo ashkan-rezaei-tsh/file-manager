@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\FileActionRequest;
 use App\Http\Requests\StoreFileRequest;
 use App\Http\Requests\StoreFolderRequest;
+use App\Http\Requests\TrashFileRequest;
 use App\Http\Resources\FileResource;
 use App\Models\File;
 use Illuminate\Http\JsonResponse;
@@ -100,18 +101,35 @@ class FileController extends Controller
             $children = $parent->children;
 
             foreach ($children as $child) {
-                $child->delete();
+                $child->moveToTrash();
             }
         } else {
             foreach ($data['ids'] ?? [] as $id) {
                 $file = File::find($id);
                 if ($file) {
-                    $file->delete();
+                    $file->moveToTrash();
                 }
             }
         }
 
         return to_route('myFiles', ['folder' => $parent->path]);
+    }
+
+    public function trash(Request $request): AnonymousResourceCollection|Response
+    {
+        $files = File::onlyTrashed()
+            ->where('created_by', Auth::id())
+            ->orderBy('is_folder', 'desc')
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(15);
+
+        $files = FileResource::collection($files);
+
+        if ($request->wantsJson()) {
+            return $files;
+        }
+
+        return Inertia::render('Trash', compact('files'));
     }
 
 
@@ -163,6 +181,55 @@ class FileController extends Controller
             'url' => $url,
             'filename' => $filename,
         ];
+    }
+
+
+    public function restore(TrashFileRequest $request)
+    {
+        $data = $request->validated();
+
+        if ($data['all']) {
+            $children = File::onlyTrashed()->where('created_by', Auth::id())->get();
+            foreach ($children as $child) {
+                $child->restore();
+            }
+        } else {
+            $ids = $data['ids'] ?? [];
+            $files = File::onlyTrashed()
+                ->where('created_by', Auth::id())
+                ->whereIn('id', $ids)
+                ->get();
+
+            foreach ($files as $file) {
+                $file->restore();
+            }
+        }
+
+        return to_route('trash');
+    }
+
+    public function deleteForever(TrashFileRequest $request)
+    {
+        $data = $request->validated();
+
+        if ($data['all']) {
+            $children = File::onlyTrashed()->where('created_by', Auth::id())->get();
+            foreach ($children as $child) {
+                $child->deleteForever();
+            }
+        } else {
+            $ids = $data['ids'] ?? [];
+            $files = File::onlyTrashed()
+                ->where('created_by', Auth::id())
+                ->whereIn('id', $ids)
+                ->get();
+
+            foreach ($files as $file) {
+                $file->deleteForever();
+            }
+        }
+
+        return to_route('trash');
     }
 
     private function getRoot()
