@@ -26,7 +26,7 @@
 import ConfirmationDialog from "@/Components/ConfirmationDialog.vue";
 import {ref} from "vue";
 import {useForm, usePage} from "@inertiajs/vue3";
-import {showErrorDialog} from "@/event-bus.js";
+import {showErrorDialog, showSuccessNotification} from "@/event-bus.js";
 
 const props = defineProps({
     deleteAll: {
@@ -66,7 +66,7 @@ function onDeleteConfirm() {
     deleteFilesForm.delete(route('file.delete'), {
         onSuccess() {
             emit('delete');
-            //TODO: Show success notification
+            showSuccessNotification('Selected files have been deleted.')
         },
         onFinish() {
             showDeleteDialog.value = false;
