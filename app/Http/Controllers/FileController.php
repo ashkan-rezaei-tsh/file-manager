@@ -70,7 +70,7 @@ class FileController extends Controller
         $parent->appendNode($file);
     }
 
-    public function store(StoreFileRequest $request)
+    public function store(StoreFileRequest $request): void
     {
         $data = $request->validated();
         $parent = $request->parent;
@@ -115,7 +115,7 @@ class FileController extends Controller
     }
 
 
-    public function download(FileActionRequest $request)
+    public function download(FileActionRequest $request): array
     {
         $data = $request->validated();
         $parent = $request->parent;
@@ -170,7 +170,7 @@ class FileController extends Controller
         return File::query()->whereIsRoot()->where('created_by', Auth::id())->firstOrFail();
     }
 
-    private function saveFileTree(mixed $fileTree, ?File $parent, mixed $user)
+    private function saveFileTree(mixed $fileTree, ?File $parent, mixed $user): void
     {
         foreach ($fileTree as $name => $file) {
             if (is_array($file)) {
@@ -231,7 +231,7 @@ class FileController extends Controller
         return asset(Storage::url($zipPath));
     }
 
-    private function addFilesToZip($zip, $files, $ancestors = '')
+    private function addFilesToZip($zip, $files, $ancestors = ''): void
     {
         foreach ($files as $file) {
             if ($file->is_folder) {
