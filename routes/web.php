@@ -33,10 +33,13 @@ Route::controller(\App\Http\Controllers\FileController::class)->middleware(['aut
 
     Route::get('/trash', 'trash')->name('trash');
 
+    Route::get('/my-favorites', 'myFavorites')->name('myFavorites');
+
     Route::post('/file', 'store')->name('file.store');
     Route::delete('/file', 'destroy')->name('file.delete');
     Route::post('/file/restore', 'restore')->name('file.restore');
     Route::delete('/file/delete-forever', 'deleteForever')->name('file.deleteForever');
+    Route::post('/file/toggle-favorite', 'toggleFavorite')->name('file.toggleFavorite');
     Route::get('/file/download', 'download')->name('file.download');
 });
 

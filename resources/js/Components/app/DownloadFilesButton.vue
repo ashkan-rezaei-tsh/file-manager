@@ -16,7 +16,7 @@
 
 <script setup>
 
-import {router, useForm, usePage} from "@inertiajs/vue3";
+import {usePage} from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {httpGet} from "@/Helper/http-helper.js";
 
@@ -33,12 +33,6 @@ const props = defineProps({
 })
 
 const page = usePage();
-// const form = useForm({
-//     all: null,
-//     ids: [],
-//     parent_id: null,
-// })
-
 
 function download() {
     if (!props.all && !props.ids.length) {
