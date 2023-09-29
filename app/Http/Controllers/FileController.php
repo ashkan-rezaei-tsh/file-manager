@@ -3,19 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\FileActionRequest;
+use App\Http\Requests\ShareFilesRequest;
 use App\Http\Requests\StoreFileRequest;
 use App\Http\Requests\StoreFolderRequest;
 use App\Http\Requests\ToggleFavoriteRequest;
 use App\Http\Requests\TrashFileRequest;
 use App\Http\Resources\FileResource;
+use App\Jobs\SendShareFileNotificationJob;
+use App\Mail\SharedFilesMail;
 use App\Models\File;
+use App\Models\FileShare;
 use App\Models\StarredFile;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -239,7 +247,7 @@ class FileController extends Controller
     public function toggleFavorite(ToggleFavoriteRequest $request)
     {
         $data = $request->validated();
-        $file = File::query()->find($data['id']);
+//        $file = File::query()->find($data['id']);
 
         $starred = StarredFile::query()
             ->where('user_id', Auth::id())
@@ -268,10 +276,69 @@ class FileController extends Controller
             ->withWhereHas('starred')
             ->paginate(15);
 
-        $files= FileResource::collection($files);
+        $files = FileResource::collection($files);
 
 
         return Inertia::render('MyFavorites', compact('files'));
+    }
+
+    public function share(ShareFilesRequest $request)
+    {
+        $data = $request->validated();
+        $emails = $data['emails'];
+        $parent = $request->parent;
+
+        $all = $data['all'] ?? false;
+        $ids = $data['ids'] ?? [];
+
+        if (!$all && empty($ids)) {
+            return [
+                'message' => 'Please select files to share'
+            ];
+        }
+
+        $users = User::query()->whereIn('email', $emails)->get();
+        //TODO: CHECK FOR NOT EXISTING USERS AND SEND SHARE AND INVITATION EMAIL TO THEM
+
+        if ($users->isEmpty()) {
+            return [
+                'message' => 'Provided emails are invalid. Please provide exist user\'s emails',
+            ];
+        }
+
+
+        if ($all) {
+            $files = $parent->children;
+        } else {
+            $files = File::query()->find($ids);
+        }
+
+        foreach ($users as $user) {
+            $sharedFiles = [];
+            foreach ($files as $file) {
+                $isExistInSharedFiles = FileShare::query()
+                    ->where('file_id', $file->id)
+                    ->where('user_id', $user->id)
+                    ->exists();
+
+                if ($isExistInSharedFiles) {
+                    continue;
+                }
+
+                FileShare::query()->create([
+                    'file_id' => $file->id,
+                    'user_id' => $user->id,
+                ]);
+
+                $sharedFiles[] = $file;
+            }
+
+            if (count($sharedFiles)) {
+                dispatch(new SendShareFileNotificationJob($user, Auth::user(), $sharedFiles));
+            }
+        }
+
+        return redirect()->back();
     }
 
     private function getRoot()

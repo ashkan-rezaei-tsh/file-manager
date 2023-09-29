@@ -40,6 +40,7 @@ Route::controller(\App\Http\Controllers\FileController::class)->middleware(['aut
     Route::post('/file/restore', 'restore')->name('file.restore');
     Route::delete('/file/delete-forever', 'deleteForever')->name('file.deleteForever');
     Route::post('/file/toggle-favorite', 'toggleFavorite')->name('file.toggleFavorite');
+    Route::post('/file/share', 'share')->name('file.share');
     Route::get('/file/download', 'download')->name('file.download');
 });
 

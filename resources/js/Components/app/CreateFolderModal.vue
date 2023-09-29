@@ -42,6 +42,7 @@ import {useForm, usePage} from "@inertiajs/vue3";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import {nextTick, ref} from "vue";
+import {showSuccessNotification} from "@/event-bus.js";
 
 const page = usePage();
 
@@ -68,10 +69,10 @@ function createFolder() {
     form.post(route('folder.create'), {
         preserveScroll: true,
         onSuccess: () => {
+            showSuccessNotification(`The Folder "${form.name}" was created`)
             closeModal();
-            form.reset();
 
-            //Show success notification
+            form.reset();
         },
         onError: () => {
             folderNameInput.value.focus();
