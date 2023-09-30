@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasCreatorAndUpdater;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,7 @@ class File extends Model
     use HasFactory, HasCreatorAndUpdater, NodeTrait, SoftDeletes;
 
     //region Attributes
+
     public function owner(): Attribute
     {
         return Attribute::make(
@@ -112,5 +114,27 @@ class File extends Model
                 Storage::delete($file->storage_path);
             }
         }
+    }
+
+    public static function getSharedWithMe(): Builder
+    {
+        return File::query()
+            ->select('files.*')
+            ->join('file_shares', 'file_shares.file_id', 'files.id')
+            ->where('file_shares.user_id', Auth::id())
+            ->orderBy('is_folder', 'desc')
+            ->orderBy('file_shares.created_at', 'desc')
+            ->orderBy('files.id', 'desc');
+    }
+
+    public static function getSharedByMe(): Builder
+    {
+        return File::query()
+            ->select('files.*')
+            ->join('file_shares', 'file_shares.file_id', 'files.id')
+            ->where('files.created_by', Auth::id())
+            ->orderBy('is_folder', 'desc')
+            ->orderBy('file_shares.created_at', 'desc')
+            ->orderBy('files.id', 'desc');
     }
 }

@@ -18,8 +18,10 @@ import NavLink from "@/Components/NavLink.vue";
             <div class="py-3">
                 <NavLink :href="route('myFiles')" :active="$page.url === '/my-files'">My Files</NavLink>
                 <NavLink :href="route('myFavorites')" :active="$page.url === '/my-favorites'">My Favorites</NavLink>
-                <NavLink href="/">Shared With Me</NavLink>
-                <NavLink href="/">Shared By Me</NavLink>
+                <NavLink :href="route('sharedWithMe')" :active="$page.url === '/shared-with-me'">Shared With Me
+                </NavLink>
+                <NavLink :href="route('sharedByMe')" :active="$page.url === '/shared-by-me'">Shared By Me
+                </NavLink>
                 <NavLink :href="route('trash')" :active="$page.url === '/trash'">Trash</NavLink>
             </div>
         </div>

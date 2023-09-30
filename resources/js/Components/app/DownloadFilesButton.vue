@@ -29,7 +29,7 @@ const props = defineProps({
     ids: {
         type: Array,
         required: false,
-    }
+    },
 })
 
 const page = usePage();
@@ -40,7 +40,9 @@ function download() {
     }
 
     const p = new URLSearchParams();
-    p.append('parent_id', page.props.folder.id);
+    if (page.props.folder) {
+        p.append('parent_id', page.props.folder.id);
+    }
 
     if (props.all) {
         p.append('all', props.all ? 1 : 0);
@@ -50,15 +52,22 @@ function download() {
         }
     }
 
-    httpGet(route('file.download') + '?' + p.toString())
+    let url = route('file.download');
+    if (page.props.shareSide) {
+        url = route('file.downloadShared');
+        p.append('shareSide', page.props.shareSide);
+    }
+
+    httpGet(url + '?' + p.toString())
         .then(response => {
             if (!response.url) {
                 return;
             }
 
             const a = document.createElement('a');
-            a.download = response.filename;
+            a.setAttribute('download', response.filename);
             a.href = response.url;
+            a.download = response.filename;
             a.click();
         })
 }

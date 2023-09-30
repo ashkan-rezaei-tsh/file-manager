@@ -31,6 +31,9 @@ Route::controller(\App\Http\Controllers\FileController::class)->middleware(['aut
         ->name('myFiles');
     Route::post('/folder/create', 'createFolder')->name('folder.create');
 
+    Route::get('/shared-with-me', 'sharedWithMe')->name('sharedWithMe');
+    Route::get('/shared-by-me', 'sharedByMe')->name('sharedByMe');
+
     Route::get('/trash', 'trash')->name('trash');
 
     Route::get('/my-favorites', 'myFavorites')->name('myFavorites');
@@ -41,7 +44,9 @@ Route::controller(\App\Http\Controllers\FileController::class)->middleware(['aut
     Route::delete('/file/delete-forever', 'deleteForever')->name('file.deleteForever');
     Route::post('/file/toggle-favorite', 'toggleFavorite')->name('file.toggleFavorite');
     Route::post('/file/share', 'share')->name('file.share');
+
     Route::get('/file/download', 'download')->name('file.download');
+    Route::get('/file/download-shared', 'downloadShared')->name('file.downloadShared');
 });
 
 Route::get('/dashboard', function () {
