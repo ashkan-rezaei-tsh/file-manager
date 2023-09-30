@@ -39,6 +39,9 @@
                     <th class="text-sm font-medium text-gray-900 px-6 py-4 text-left">
                         Name
                     </th>
+                    <th v-if="search" class="text-sm font-medium text-gray-900 px-6 py-4 text-left">
+                        Path
+                    </th>
                     <th class="text-sm font-medium text-gray-900 px-6 py-4 text-left">
                         Owner
                     </th>
@@ -80,6 +83,9 @@
                         <FileIcon :file="file"/>
                         {{ file.name }}
                     </td>
+                    <td v-if="search" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {{ file.path }}
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {{ file.owner }}
                     </td>
@@ -112,6 +118,7 @@ import Checkbox from "@/Components/Checkbox.vue";
 import DeleteFilesButton from "@/Components/app/DeleteFilesButton.vue";
 import DownloadFilesButton from "@/Components/app/DownloadFilesButton.vue";
 import ShareFilesButton from "@/Components/app/ShareFilesButton.vue";
+import {emitter, ON_SEARCH} from "@/event-bus.js";
 
 const props = defineProps({
     files: Object,
@@ -126,6 +133,7 @@ const allFiles = ref({
 });
 const allSelected = ref(false);
 const selected = ref({});
+const search = ref('');
 
 const page = usePage();
 
@@ -207,6 +215,14 @@ onUpdated(() => {
 })
 
 onMounted(() => {
+    const params = new URLSearchParams(window.location.search);
+    search.value = params.get('search');
+
+    emitter.on(ON_SEARCH, (value) => {
+        search.value = value;
+    })
+
+
     const observer = new IntersectionObserver((entries) => {
         return entries.forEach(entry => entry.isIntersecting && loadMore())
     }, {

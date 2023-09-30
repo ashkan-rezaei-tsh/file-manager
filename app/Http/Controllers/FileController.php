@@ -33,6 +33,8 @@ class FileController extends Controller
 {
     public function myFiles(Request $request, string $folder = null): AnonymousResourceCollection|Response
     {
+        $search = $request->get('search');
+
         if ($folder) {
             $folder = File::query()
                 ->where('created_by', Auth::id())
@@ -44,14 +46,21 @@ class FileController extends Controller
             $folder = $this->getRoot();
         }
 
-        $files = File::query()
+        $query = File::query()
             ->with('starred')
-            ->where('parent_id', $folder->id)
             ->where('created_by', Auth::id())
+            ->where('_lft', '!=', 1)
             ->orderBy('is_folder', 'desc')
             ->orderBy('created_at', 'desc')
-            ->orderBy('id', 'desc')
-            ->paginate(15);
+            ->orderBy('id', 'desc');
+
+        if ($search) {
+            $query->where('name', 'like', "%$search%");
+        } else {
+            $query->where('parent_id', $folder->id);
+        }
+
+        $files = $query->paginate(15);
 
         $files = FileResource::collection($files);
 
@@ -129,12 +138,20 @@ class FileController extends Controller
 
     public function trash(Request $request): AnonymousResourceCollection|Response
     {
-        $files = File::onlyTrashed()
+        $search = $request->get('search');
+
+        $query = File::onlyTrashed()
             ->where('created_by', Auth::id())
             ->orderBy('is_folder', 'desc')
             ->orderBy('deleted_at', 'desc')
-            ->orderBy('id', 'desc')
-            ->paginate(15);
+            ->orderBy('id', 'desc');
+
+        if ($search) {
+            $query->where('name', 'like', "%$search%");
+        }
+
+
+        $files = $query->paginate(15);
 
         $files = FileResource::collection($files);
 
@@ -321,8 +338,15 @@ class FileController extends Controller
 
     public function sharedWithMe(Request $request): AnonymousResourceCollection|Response
     {
-        $files = File::getSharedWithMe()
-            ->paginate(15);
+        $search = $request->get('search');
+
+        $query = File::getSharedWithMe();
+
+        if ($search) {
+            $query->where('name', 'like', "%$search%");
+        }
+
+        $files = $query->paginate(15);
 
 
         $files = FileResource::collection($files);
@@ -338,8 +362,16 @@ class FileController extends Controller
 
     public function sharedByMe(Request $request): AnonymousResourceCollection|Response
     {
-        $files = File::getSharedByMe()
-            ->paginate(15);
+        $search = $request->get('search');
+
+        $query = File::getSharedByMe();
+
+        if ($search) {
+            $query->where('name', 'like', "%$search%");
+        }
+
+        $files = $query->paginate(15);
+
 
         $files = FileResource::collection($files);
 
